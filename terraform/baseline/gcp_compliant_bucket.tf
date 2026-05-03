@@ -9,7 +9,7 @@ resource "google_storage_bucket" "modify_target" {
   location = "US"
 
   public_access_prevention    = "enforced"
-  uniform_bucket_level_access = true
+  uniform_bucket_level_access = false
 
   versioning {
     enabled = true
