@@ -15,3 +15,13 @@ resource "google_storage_bucket" "fixtures" {
   location = "US"
   public_access_prevention = "enforced"
 }
+
+# Synchronize-event smoke:  a second non-compliant block added in
+# a follow-up commit to the same PR.  Bot's auto-trigger should
+# fire on synchronize, post NEW comments for this block, leave
+# the existing comments on the original block untouched
+# (idempotency).
+resource "google_storage_bucket" "fixtures_two" {
+  name     = "engine-bot-fixtures-bucket-two"
+  location = "US"
+}
