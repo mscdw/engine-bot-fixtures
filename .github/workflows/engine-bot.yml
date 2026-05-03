@@ -35,11 +35,11 @@ jobs:
       contents: read
       pull-requests: write     # required for posting review comments
     steps:
-      - name: Checkout engine-bot (private)
+      - name: Checkout engine-bot (private, pinned to v0.1.0)
         uses: actions/checkout@v4
         with:
           repository: mscdw/engine-bot
-          ref: main
+          ref: v0.1.0   # production tag;  bump when v0.2 (drift mode) ships
           token: ${{ secrets.ENGINE_BOT_TOKEN }}
           path: .engine-bot
 
