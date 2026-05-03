@@ -39,7 +39,7 @@ resource "google_storage_bucket" "this" {
   # @engine.v1 attr=uniform_bucket_level_access ctrl=kics-bb0db090-5509-4853-a827-75ced0b3caa0 role=concurring upstream=kics src=literal expected=true
   # ckv-gcp-29 (checkov): Ensure that Cloud Storage buckets have uniform bucket-level access enabled
   # kics-bb0db090-5509-4853-a827-75ced0b3caa0 [concurring] (kics): Google Storage Bucket Level Access Disabled
-  uniform_bucket_level_access = false
+  uniform_bucket_level_access = true
 
   # value=var (operational: no rule constraint; operator supplies)
   default_event_based_hold = var.default_event_based_hold
