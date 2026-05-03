@@ -31,11 +31,11 @@ jobs:
         with:
           fetch-depth: 0    # full history -- branches off origin/<base>
 
-      - name: Checkout engine-bot (private, pinned to v0.2.0)
+      - name: Checkout engine-bot (private, pinned to v0.2.1)
         uses: actions/checkout@v4
         with:
           repository: mscdw/engine-bot
-          ref: v0.2.0
+          ref: v0.2.1
           token: ${{ secrets.ENGINE_BOT_TOKEN }}
           path: .engine-bot
 
