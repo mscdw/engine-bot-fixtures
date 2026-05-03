@@ -31,11 +31,11 @@ jobs:
         with:
           fetch-depth: 0    # full history -- branches off origin/<base>
 
-      - name: Checkout engine-bot (private, pinned to v0.2.3)
+      - name: Checkout engine-bot (private, pinned to v0.3.0)
         uses: actions/checkout@v4
         with:
           repository: mscdw/engine-bot
-          ref: v0.2.3
+          ref: v0.3.0   # D283 per-axis bundle consumer (clean break from v1 manifest shape)
           token: ${{ secrets.ENGINE_BOT_TOKEN }}
           path: .engine-bot
 
@@ -62,4 +62,5 @@ jobs:
           git config user.email "engine-bot@users.noreply.github.com"
           engine-bot drift "${GITHUB_WORKSPACE}" \
             --base-ref "${{ inputs.base_ref || 'main' }}" \
+            --bundles-tag d283-smoke-001 \
             --push

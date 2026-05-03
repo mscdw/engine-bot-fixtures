@@ -35,11 +35,11 @@ jobs:
       contents: read
       pull-requests: write     # required for posting review comments
     steps:
-      - name: Checkout engine-bot (private, pinned to v0.2.3)
+      - name: Checkout engine-bot (private, pinned to v0.3.0)
         uses: actions/checkout@v4
         with:
           repository: mscdw/engine-bot
-          ref: v0.2.3   # production tag (engine-bundles private-fetch)
+          ref: v0.3.0   # D283 per-axis bundle consumer (clean break from v1 manifest shape)
           token: ${{ secrets.ENGINE_BOT_TOKEN }}
           path: .engine-bot
 
@@ -82,5 +82,5 @@ jobs:
         run: |
           engine-bot suggest \
             --pr "${{ steps.pr.outputs.url }}" \
-            --bundles-tag manual-9f38ef5a70db \
+            --bundles-tag d283-smoke-001 \
             --post
