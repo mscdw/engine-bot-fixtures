@@ -1,0 +1,61 @@
+name: engine-bot-drift
+
+# v0.2 ``drift`` mode smoke target.  Walks the consumer repo for
+# engine-emitted main.tf files (those carrying the
+# ``# @engine.v1 audit-bundle:`` header) + opens one PR per
+# attribute that drifted from its canonical expected value.
+#
+# Triggers:
+#   workflow_dispatch -- manual smoke runs
+#   schedule (commented) -- production cadence;  uncomment when
+#     ready to operate on a weekly drift sweep.
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_ref:
+        description: "Base branch for opened drift PRs (default: main)."
+        required: false
+        default: "main"
+  # schedule:
+  #   - cron: '0 6 * * 1'   # Mondays 06:00 UTC
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # drift mode opens branches + commits
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # full history -- branches off origin/<base>
+
+      - name: Checkout engine-bot (private, pinned to v0.2.0)
+        uses: actions/checkout@v4
+        with:
+          repository: mscdw/engine-bot
+          ref: v0.2.0
+          token: ${{ secrets.ENGINE_BOT_TOKEN }}
+          path: .engine-bot
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install engine-bot
+        run: pip install ./.engine-bot
+
+      - name: engine-bot drift --push
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          # actions/checkout doesn't set a default git identity --
+          # drift mode's subprocess git commits need both.
+          git config user.name  "engine-bot"
+          git config user.email "engine-bot@users.noreply.github.com"
+          engine-bot drift "${GITHUB_WORKSPACE}" \
+            --base-ref "${{ inputs.base_ref || 'main' }}" \
+            --push
