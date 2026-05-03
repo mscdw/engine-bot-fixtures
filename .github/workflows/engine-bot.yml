@@ -35,11 +35,11 @@ jobs:
       contents: read
       pull-requests: write     # required for posting review comments
     steps:
-      - name: Checkout engine-bot (private, pinned to v0.1.0)
+      - name: Checkout engine-bot (private, pinned to v0.2.2)
         uses: actions/checkout@v4
         with:
           repository: mscdw/engine-bot
-          ref: v0.1.0   # production tag;  bump when v0.2 (drift mode) ships
+          ref: v0.2.2   # production tag (engine-bundles private-fetch)
           token: ${{ secrets.ENGINE_BOT_TOKEN }}
           path: .engine-bot
 
@@ -72,6 +72,13 @@ jobs:
           # scope (declared in permissions block above) -- the PAT is
           # only for the engine-bot CHECKOUT, not for posting.
           GITHUB_TOKEN: ${{ github.token }}
+          # mscdw/engine-bundles is private during development;  the
+          # workflow's GITHUB_TOKEN can't fetch bundles cross-repo,
+          # so a separate fine-grained PAT (contents:read on
+          # mscdw/engine-bundles only) is provided here.  When the
+          # bundles repo goes back public, this can be set to "" or
+          # removed entirely.
+          ENGINE_BUNDLES_TOKEN: ${{ secrets.BUNDLES_READ_TOKEN }}
         run: |
           engine-bot suggest \
             --pr "${{ steps.pr.outputs.url }}" \

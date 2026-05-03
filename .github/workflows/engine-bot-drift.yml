@@ -31,11 +31,11 @@ jobs:
         with:
           fetch-depth: 0    # full history -- branches off origin/<base>
 
-      - name: Checkout engine-bot (private, pinned to v0.2.1)
+      - name: Checkout engine-bot (private, pinned to v0.2.2)
         uses: actions/checkout@v4
         with:
           repository: mscdw/engine-bot
-          ref: v0.2.1
+          ref: v0.2.2
           token: ${{ secrets.ENGINE_BOT_TOKEN }}
           path: .engine-bot
 
@@ -51,6 +51,10 @@ jobs:
       - name: engine-bot drift --push
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          # Private bundles-repo PAT (contents:read on
+          # mscdw/engine-bundles).  See engine-bot.yml for the same
+          # pattern + reversibility note.
+          ENGINE_BUNDLES_TOKEN: ${{ secrets.BUNDLES_READ_TOKEN }}
         run: |
           # actions/checkout doesn't set a default git identity --
           # drift mode's subprocess git commits need both.
