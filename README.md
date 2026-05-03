@@ -31,3 +31,7 @@ against a stable URL.
    non-compliance you want to surface.
 3. `git push -u origin <fixture-name>` and open a PR against `main`.
 4. Document the expected findings in this README.
+
+## Smoke note
+
+engine-bot's path filter should NOT fire this workflow because no *.tf files changed.
