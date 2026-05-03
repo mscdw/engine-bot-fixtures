@@ -13,4 +13,5 @@
 resource "google_storage_bucket" "fixtures" {
   name     = "engine-bot-fixtures-bucket"
   location = "US"
+  public_access_prevention = "enforced"
 }
