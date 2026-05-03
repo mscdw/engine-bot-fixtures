@@ -1,0 +1,33 @@
+name: engine-bot
+
+# Smoke target for engine-bot v0.1 (suggest mode).  On every pull
+# request that touches *.tf files, run the bot:  scan changed files
+# against canonical bundles published to mscdw/engine-bundles, post
+# inline review comments with one-click suggested-change blocks for
+# every compliance gap.
+
+on:
+  pull_request:
+    paths:
+      - '**/*.tf'
+  workflow_dispatch:
+    inputs:
+      pr_url:
+        description: "PR URL to scan (manual runs only)."
+        required: true
+
+jobs:
+  suggest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write     # required for posting review comments
+    steps:
+      - uses: mscdw/engine-bot@main
+        with:
+          # Pin to the engine smoke release that has google_storage_bucket
+          # bundled.  Once a real v0.1.x engine release ships clean,
+          # bump this to ``latest`` (or pin to that tag).
+          bundles-tag: manual-9f38ef5a70db
+          pr: ${{ inputs.pr_url }}    # empty on pull_request events
+                                       # -> defaults to triggering PR
