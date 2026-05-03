@@ -60,7 +60,11 @@ jobs:
           # drift mode's subprocess git commits need both.
           git config user.name  "engine-bot"
           git config user.email "engine-bot@users.noreply.github.com"
+          # Drift mode is bundle-store-free as of v0.3.0 -- it reads
+          # the canonical expected literal directly from each ``@engine.v1
+          # role=primary src=literal expected=<value>`` annotation in
+          # the consumer's main.tf, not from a bundle fetch.  Hence no
+          # ``--bundles-tag`` flag here (the CLI rejects it).
           engine-bot drift "${GITHUB_WORKSPACE}" \
             --base-ref "${{ inputs.base_ref || 'main' }}" \
-            --bundles-tag d283-smoke-001 \
             --push
