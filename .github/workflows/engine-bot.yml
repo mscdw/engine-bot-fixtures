@@ -5,6 +5,18 @@ name: engine-bot
 # against canonical bundles published to mscdw/engine-bundles, post
 # inline review comments with one-click suggested-change blocks for
 # every compliance gap.
+#
+# During development both engine-bot + this fixtures repo are
+# private.  GitHub Actions on personal accounts can't ``uses:`` a
+# private cross-repo action directly, so we fetch + install the bot
+# via a PAT-authenticated checkout pattern.  When engine-bot ships
+# publicly we collapse this back to the single ``uses: mscdw/engine-
+# bot@v0.1.0`` line that the engine-bot/action.yml supports.
+#
+# Required secret on this repo:
+#   ENGINE_BOT_TOKEN -- fine-grained PAT scoped to mscdw/engine-bot
+#                       only, contents:read.  Used by actions/checkout
+#                       to pull the bot's source for pip install.
 
 on:
   pull_request:
@@ -23,11 +35,45 @@ jobs:
       contents: read
       pull-requests: write     # required for posting review comments
     steps:
-      - uses: mscdw/engine-bot@main
+      - name: Checkout engine-bot (private)
+        uses: actions/checkout@v4
         with:
-          # Pin to the engine smoke release that has google_storage_bucket
-          # bundled.  Once a real v0.1.x engine release ships clean,
-          # bump this to ``latest`` (or pin to that tag).
-          bundles-tag: manual-9f38ef5a70db
-          pr: ${{ inputs.pr_url }}    # empty on pull_request events
-                                       # -> defaults to triggering PR
+          repository: mscdw/engine-bot
+          ref: main
+          token: ${{ secrets.ENGINE_BOT_TOKEN }}
+          path: .engine-bot
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install engine-bot
+        run: pip install ./.engine-bot
+
+      - name: Resolve PR URL
+        id: pr
+        run: |
+          URL="${{ inputs.pr_url }}"
+          if [ -z "$URL" ]; then
+            URL="${{ github.event.pull_request.html_url }}"
+          fi
+          if [ -z "$URL" ]; then
+            echo "ERROR: no PR URL.  Set 'pr_url' input or run on a pull_request event."
+            exit 1
+          fi
+          echo "url=${URL}" >> "$GITHUB_OUTPUT"
+
+      - name: engine-bot suggest --post
+        env:
+          # Bot needs pull_requests:write to post inline review comments
+          # on this repo's PR.  Workflow's own GITHUB_TOKEN has the
+          # scope (declared in permissions block above) -- the PAT is
+          # only for the engine-bot CHECKOUT, not for posting.
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          engine-bot suggest \
+            --pr "${{ steps.pr.outputs.url }}" \
+            --bundles-tag manual-9f38ef5a70db \
+            --post
