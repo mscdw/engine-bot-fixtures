@@ -34,6 +34,8 @@ means re-runs converge without piling up duplicate comments or PRs.
 | [#5](../../pull/5) | `readme-only` | (none -- README change only) | Workflow does NOT fire — `paths: ['**/*.tf']` filter validation. |
 | [#6](../../pull/6) | `multi-file` | `google_storage_bucket` + `google_dns_managed_zone` | 5 findings split 4/1 across two files.  Tests multi-file scanning. |
 | [#7](../../pull/7) | `var-on-user-side` | `google_storage_bucket.var_user` | 3 findings (NOT 4). `public_access_prevention = var.pap` silent-skip (var-typed user value). |
+| [#9](../../pull/9) | `aws-s3-bucket-gaps` | `aws_s3_bucket` | N findings on the original block + N findings on a second block.  AWS axis parallel of #1.  DO NOT MERGE. |
+| [#10](../../pull/10) | `azure-storage-account-gaps` | `azurerm_storage_account` | N findings on the original block + N findings on a second block.  Azure axis parallel of #1.  DO NOT MERGE. |
 
 ### `drift` mode targets
 
@@ -43,10 +45,10 @@ means re-runs converge without piling up duplicate comments or PRs.
 
 ## Workflows
 
-| Workflow | Trigger | Mode | Pin |
-|---|---|---|---|
-| `engine-bot.yml` | `pull_request` (`paths: ['**/*.tf']`) | `suggest --post` | `mscdw/engine-bot@v0.1.0` |
-| `engine-bot-drift.yml` | `workflow_dispatch` (cron commented for manual control) | `drift --push` | `mscdw/engine-bot@v0.2.1` |
+| Workflow | Trigger | Mode | Bot pin | Bundles tag |
+|---|---|---|---|---|
+| `engine-bot.yml` | `pull_request` (`paths: ['**/*.tf']`) | `suggest --post` | `mscdw/engine-bot@v0.3.0` | `d283-smoke-001` |
+| `engine-bot-drift.yml` | `workflow_dispatch` (cron commented for manual control) | `drift --push` | `mscdw/engine-bot@v0.3.0` | _(N/A — drift mode reads `expected=` directly from `@engine.v1` annotations, no bundle fetch)_ |
 
 Both workflows pull `mscdw/engine-bot` as a private cross-repo
 checkout via the `ENGINE_BOT_TOKEN` PAT secret (since `engine-bot`
