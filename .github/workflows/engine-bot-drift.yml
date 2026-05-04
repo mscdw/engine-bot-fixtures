@@ -31,11 +31,11 @@ jobs:
         with:
           fetch-depth: 0    # full history -- branches off origin/<base>
 
-      - name: Checkout engine-bot (private, pinned to v0.3.0)
+      - name: Checkout engine-bot (private, pinned to v0.3.1)
         uses: actions/checkout@v4
         with:
           repository: mscdw/engine-bot
-          ref: v0.3.0   # D283 per-axis bundle consumer (clean break from v1 manifest shape)
+          ref: v0.3.1   # v0.3.0 D283 per-axis bundles + v0.3.1 'Report finding' footer
           token: ${{ secrets.ENGINE_BOT_TOKEN }}
           path: .engine-bot
 
